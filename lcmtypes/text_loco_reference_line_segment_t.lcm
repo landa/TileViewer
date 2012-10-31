@@ -1,0 +1,17 @@
+package text_loco;
+
+struct reference_line_segment_t
+{
+	// The start of hte line segment
+	// Note: line segment are OPRIENTED by start->end
+	// Note: in meters
+	double start[3];
+	
+	// Then end of the line segment
+	// In meters
+	double end[3];
+
+	// The 'origin' of the reference for the line segment
+	// This is guaranteed to be ON THE LINE SEGMENT
+	double reference_origin[3];
+}

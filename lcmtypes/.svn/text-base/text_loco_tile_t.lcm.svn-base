@@ -1,0 +1,23 @@
+package text_loco;
+
+struct tile_t 
+{
+	int64_t utime;
+	
+	// the normal vector 
+	// length normalized to 1
+	double normal_direction[3];
+	
+	// The bottom left corner, also (0,0) in the tile coordinates
+	// This is an xyz point in meters in the global reference frame
+	double origin[3];
+	
+	// The direction of the x and y axis of tile	
+	// (These are normalized to length of 1)
+	double x_axis_direction[3];
+	double y_axis_direction[3];
+	
+	// The width and height of the tile (in meters)
+	double width;
+	double height;
+}

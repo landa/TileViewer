@@ -1,0 +1,13 @@
+package text_loco;
+
+struct tile_set_t
+{
+	int64_t utime;
+
+	// the timestamp of hte image this pertains to
+	int64_t linked_image_utime;
+
+	// an array of tiles
+	int32_t num_tiles;
+	tile_t tiles[num_tiles];
+}

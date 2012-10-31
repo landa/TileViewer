@@ -1,0 +1,41 @@
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/bocelli/!svn/ver/49/text_loco/text_loco_pod/lcmtypes
+END
+text_loco_reference_line_segment_t.lcm
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/bocelli/!svn/ver/42/text_loco/text_loco_pod/lcmtypes/text_loco_reference_line_segment_t.lcm
+END
+text_loco_tile_set_t.lcm
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/bocelli/!svn/ver/49/text_loco/text_loco_pod/lcmtypes/text_loco_tile_set_t.lcm
+END
+example_t.lcm
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/bocelli/!svn/ver/1/text_loco/text_loco_pod/lcmtypes/example_t.lcm
+END
+text_loco_tile_t.lcm
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/bocelli/!svn/ver/38/text_loco/text_loco_pod/lcmtypes/text_loco_tile_t.lcm
+END
+README.txt
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/bocelli/!svn/ver/1/text_loco/text_loco_pod/lcmtypes/README.txt
+END
+text_loco_reference_line_segment_set_t.lcm
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/bocelli/!svn/ver/49/text_loco/text_loco_pod/lcmtypes/text_loco_reference_line_segment_set_t.lcm
+END

@@ -1,0 +1,10 @@
+package text_loco;
+
+struct tile_to_image_t 
+{
+	int64_t utime;
+	tile_t tile;
+	int64_t image_utime;
+  int64_t x;
+  int64_t y;
+}
