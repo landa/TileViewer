@@ -41,6 +41,7 @@ class Handler : public QObject
 
   map<double, vector<int64_t> >* tile_to_image_utimes;
   vector<double>* tiles_seen;
+  map<double, int>* tiles_to_coords;
   map<int64_t, QImage>* image_utime_to_image;
   TileViewer* windowPointer;
 

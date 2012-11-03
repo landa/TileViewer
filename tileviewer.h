@@ -21,32 +21,33 @@ using namespace bot_core;
 using namespace text_loco;
 
 namespace Ui {
-class TileViewer;
+  class TileViewer;
 }
 
 class TileViewer : public QMainWindow
 {
-    Q_OBJECT
-    
-public:
-    explicit TileViewer(QWidget *parent = 0);
-    ~TileViewer();
-    void updateImage(double tileOrigin);
-    void setFrame(int position);
-    void setTile(int x, int y);
+  Q_OBJECT
 
-		map<double, vector<int64_t> >* tile_to_image_utimes;
-		vector<double>* tiles_seen;
-		map<int64_t, QImage>* image_utime_to_image;
-		vector<QImage>* maps;
-		double selectedOrigin;
+public:
+  explicit TileViewer(QWidget *parent = 0);
+  ~TileViewer();
+  void updateImage(double tileOrigin);
+  void setTile(int x, int y);
+
+  map<double, vector<int64_t> >* tile_to_image_utimes;
+  vector<double>* tiles_seen;
+  map<double, int>* tiles_to_coords;
+  map<int64_t, QImage>* image_utime_to_image;
+  vector<QImage>* maps;
+  double selectedOrigin;
 
 public slots:
-	void receivedImageForTile(double tileOrigin);
-	void updateMap();
+  void receivedImageForTile(double tileOrigin);
+  void updateMap();
+  void setFrame(int position);
 
 private:
-    Ui::TileViewer *ui;
+  Ui::TileViewer *ui;
 };
 
 #endif // TILEVIEWER_H

@@ -12,6 +12,7 @@ void Handler::handleMessage(const lcm::ReceiveBuffer* rbuf,
 	// if we haven't seen this tile, add it to our vector
 	if (find((*tiles_seen).begin(), (*tiles_seen).end(), origin) == (*tiles_seen).end()) {
 			(*tiles_seen).push_back(origin);
+			(*tiles_to_coords)[origin] = msg->y;
 		}
 
 	// if we don't have this image for our tile, add it
@@ -46,8 +47,21 @@ void Handler::handleImage(const lcm::ReceiveBuffer* rbuf,
   image.data = (unsigned char*) malloc(current.size);
   copy(current.data.begin(), current.data.end(), image.data);
   image = image(Rect(0, 0, MIN(image.cols, 1024), MIN(image.rows, 768)));
-  //Mat scaled;
-  //resize(image, scaled, Size(), 0.5, 0.5, INTER_NEAREST);
+  // Draw a checkerboard pattern on the image
+  int checkerXOffset = 10;
+  int checkerYOffset = image.rows - 70;
+  // row 1
+  rectangle(image, Point(0+checkerXOffset, 0+checkerYOffset), Point(20+checkerXOffset, 20+checkerYOffset), Scalar(0, 0, 0), -1);
+  rectangle(image, Point(20+checkerXOffset, 0+checkerYOffset), Point(40+checkerXOffset, 20+checkerYOffset), Scalar(255, 255, 255), -1);
+  rectangle(image, Point(40+checkerXOffset, 0+checkerYOffset), Point(60+checkerXOffset, 20+checkerYOffset), Scalar(0, 0, 0), -1);
+  // row 2
+  rectangle(image, Point(0+checkerXOffset, 20+checkerYOffset), Point(20+checkerXOffset, 40+checkerYOffset), Scalar(255, 255, 255), -1);
+  rectangle(image, Point(20+checkerXOffset, 20+checkerYOffset), Point(40+checkerXOffset, 40+checkerYOffset), Scalar(0, 0, 0), -1);
+  rectangle(image, Point(40+checkerXOffset, 20+checkerYOffset), Point(60+checkerXOffset, 40+checkerYOffset), Scalar(255, 255, 255), -1);
+  // row 3
+  rectangle(image, Point(0+checkerXOffset, 40+checkerYOffset), Point(20+checkerXOffset, 60+checkerYOffset), Scalar(0, 0, 0), -1);
+  rectangle(image, Point(20+checkerXOffset, 40+checkerYOffset), Point(40+checkerXOffset, 60+checkerYOffset), Scalar(255, 255, 255), -1);
+  rectangle(image, Point(40+checkerXOffset, 40+checkerYOffset), Point(60+checkerXOffset, 60+checkerYOffset), Scalar(0, 0, 0), -1);
   QImage qimage = QImage((const unsigned char*)(image.data), image.cols, image.rows, image.step, QImage::Format_RGB32);
   (*image_utime_to_image)[msg->utime] = qimage;
   image.release();
@@ -57,11 +71,10 @@ void Handler::handleMap(const lcm::ReceiveBuffer* rbuf,
                  const std::string& chan,
                  const bot_core::image_t* msg) {
   image_t current = *msg;
-  Mat image(current.height,current.width,CV_8UC3);
+  Mat image(current.height,current.width,CV_8UC4);
   image.data = (unsigned char*) malloc(current.size);
   copy(current.data.begin(), current.data.end(), image.data);
-  QImage qimage = QImage((const unsigned char*)(image.data), image.cols, image.rows, QImage::Format_RGB555);
-  qimage.rgbSwapped();
+  QImage qimage = QImage((const unsigned char*)(image.data), image.cols, image.rows, image.step, QImage::Format_RGB32);
   windowPointer->maps->push_back(qimage);
   emit receivedMap();
   image.release();

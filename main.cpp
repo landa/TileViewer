@@ -24,6 +24,7 @@ int main(int argc, char *argv[])
     lcm::LCM lcm_instance;
     map<double, vector<int64_t> >* tile_to_image_utimes = new map<double, vector<int64_t> >;
     vector<double>* tiles_seen = new vector<double>;
+    map<double, int>* tiles_to_coords = new map<double, int>;
     map<int64_t, QImage>* image_utime_to_image = new map<int64_t, QImage>;
 
 		if(!lcm_instance.good())
@@ -32,10 +33,12 @@ int main(int argc, char *argv[])
 		Handler handlerObject;
 		handlerObject.tile_to_image_utimes = tile_to_image_utimes;
 		handlerObject.tiles_seen = tiles_seen;
+		handlerObject.tiles_to_coords = tiles_to_coords;
 		handlerObject.image_utime_to_image = image_utime_to_image;
 
 		w.tile_to_image_utimes = tile_to_image_utimes;
 		w.tiles_seen = tiles_seen;
+		w.tiles_to_coords = tiles_to_coords;
 		w.image_utime_to_image = image_utime_to_image;
 
 		handlerObject.windowPointer = &w;
@@ -48,8 +51,6 @@ int main(int argc, char *argv[])
 										 &w, SLOT(receivedImageForTile(double)));
 		QObject::connect(&handlerObject, SIGNAL(receivedMap()),
 										 &w, SLOT(updateMap()));
-		/*connect(horizontalSlider, SIGNAL(valueChanged(int)),
-						&w, SLOT(setFrame(int)));*/
 
 		LCMThread lcmThread;
 		lcmThread.setLCM(&lcm_instance);
