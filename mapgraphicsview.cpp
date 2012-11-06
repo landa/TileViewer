@@ -1,14 +1,14 @@
-#include "clickablegraphicsview.h"
+#include "mapgraphicsview.h"
 
-ClickableGraphicsView::ClickableGraphicsView(QObject *parent)
+MapGraphicsView::MapGraphicsView(QObject *parent)
 {
 }
 
-void ClickableGraphicsView::mousePressEvent(QMouseEvent *event)
+void MapGraphicsView::mousePressEvent(QMouseEvent *event)
 {
   windowPointer->setTile(event->x(), event->y());
 }
 
-void ClickableGraphicsView::setWindow(TileViewer* window) {
+void MapGraphicsView::setWindow(TileViewer* window) {
   windowPointer = window;
 }

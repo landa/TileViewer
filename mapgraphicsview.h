@@ -6,20 +6,23 @@
 #include <tileviewer.h>
 #include <iostream>
 
-class ClickableGraphicsView : public QGraphicsView
+/**
+ * Used to represent a clickable 2D map of the world with tiles.
+ */
+class MapGraphicsView : public QGraphicsView
 {
   Q_OBJECT
 public:
-  explicit ClickableGraphicsView(QObject *parent = 0);
+  explicit MapGraphicsView(QObject *parent = 0);
   void mousePressEvent(QMouseEvent *event);
   void setWindow(TileViewer* window);
 
   TileViewer* windowPointer;
-  
+
 signals:
-  
+
 public slots:
-  
+
 };
 
 #endif // CLICKABLEGRAPHICSVIEW_H

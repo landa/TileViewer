@@ -17,44 +17,52 @@ using namespace cv;
 
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
-    TileViewer w;
-    w.show();
+  QApplication a(argc, argv);
+  TileViewer w;
+  w.show();
 
-    lcm::LCM lcm_instance;
-    map<double, vector<int64_t> >* tile_to_image_utimes = new map<double, vector<int64_t> >;
-    vector<double>* tiles_seen = new vector<double>;
-    map<double, int>* tiles_to_coords = new map<double, int>;
-    map<int64_t, QImage>* image_utime_to_image = new map<int64_t, QImage>;
+  lcm::LCM lcm_instance;
 
-		if(!lcm_instance.good())
-			return 1;
+  // map from tile origins (represented as doubles) to a vector of timestamps
+  // representing the images belonging to that tile
+  map<double, vector<int64_t> >* mapTileOriginToImageTimestamp = new map<double, vector<int64_t> >;
+  // vector of all tile origins seen
+  vector<double>* allTileOrigins = new vector<double>;
+  // map from tile origins to map coordinates (to handle mouse clicks on the map)
+  map<double, int>* mapTileOriginToMapCoords = new map<double, int>;
+  // map from an image timestamp to the image itself
+  map<int64_t, QImage>* mapImageTimestampToImage = new map<int64_t, QImage>;
 
-		Handler handlerObject;
-		handlerObject.tile_to_image_utimes = tile_to_image_utimes;
-		handlerObject.tiles_seen = tiles_seen;
-		handlerObject.tiles_to_coords = tiles_to_coords;
-		handlerObject.image_utime_to_image = image_utime_to_image;
+  if(!lcm_instance.good()) return 1;
 
-		w.tile_to_image_utimes = tile_to_image_utimes;
-		w.tiles_seen = tiles_seen;
-		w.tiles_to_coords = tiles_to_coords;
-		w.image_utime_to_image = image_utime_to_image;
+  Handler handlerObject;
+  handlerObject.mapTileOriginToImageTimestamp = mapTileOriginToImageTimestamp;
+  handlerObject.allTileOrigins = allTileOrigins;
+  handlerObject.mapTileOriginToMapCoords = mapTileOriginToMapCoords;
+  handlerObject.mapImageTimestampToImage = mapImageTimestampToImage;
 
-		handlerObject.windowPointer = &w;
+  w.mapTileOriginToImageTimestamp = mapTileOriginToImageTimestamp;
+  w.allTileOrigins = allTileOrigins;
+  w.mapTileOriginToMapCoords = mapTileOriginToMapCoords;
+  w.mapImageTimestampToImage = mapImageTimestampToImage;
 
-		lcm_instance.subscribe("TILE_TO_IMAGE_UTIMES", &Handler::handleMessage, &handlerObject);
-		lcm_instance.subscribe("CAMLCM_IMAGE", &Handler::handleImage, &handlerObject);
-		lcm_instance.subscribe("TILES_MAP", &Handler::handleMap, &handlerObject);
+  handlerObject.windowPointer = &w;
 
-		QObject::connect(&handlerObject, SIGNAL(receivedImageForTile(double)),
-										 &w, SLOT(receivedImageForTile(double)));
-		QObject::connect(&handlerObject, SIGNAL(receivedMap()),
-										 &w, SLOT(updateMap()));
+  // handle LCM messages on the following channels
+  lcm_instance.subscribe("TILE_TO_IMAGE_UTIMES", &Handler::handleImageTileAssoc, &handlerObject);
+  lcm_instance.subscribe("CAMLCM_IMAGE", &Handler::handleImageFrame, &handlerObject);
+  lcm_instance.subscribe("TILES_MAP", &Handler::handleMapImage, &handlerObject);
 
-		LCMThread lcmThread;
-		lcmThread.setLCM(&lcm_instance);
-		lcmThread.start();
+  // connect tile image receipt signals to the corresponding window update slot
+  QObject::connect(&handlerObject, SIGNAL(receivedImageForTile(double)),
+                   &w, SLOT(receivedImageForTile(double)));
+  // connect a map image receipt signal to the corresponding window update slot
+  QObject::connect(&handlerObject, SIGNAL(receivedMap()),
+                   &w, SLOT(updateMap()));
 
-    return a.exec();
+  LCMThread lcmThread;
+  lcmThread.setLCM(&lcm_instance);
+  lcmThread.start();
+
+  return a.exec();
 }

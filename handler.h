@@ -18,36 +18,40 @@ using namespace cv;
 using namespace bot_core;
 using namespace text_loco;
 
+/**
+ * LCM Handler, used to process messages received over LCM
+ * including images, image-tile associations, and map updates
+ */
 class Handler : public QObject
 {
 
-	Q_OBJECT
+  Q_OBJECT
 
-	public:
-	Handler() {}
-	~Handler() {}
+public:
+  Handler() {}
+  ~Handler() {}
 
-  void handleMessage(const lcm::ReceiveBuffer* rbuf,
+  void handleImageTileAssoc(const lcm::ReceiveBuffer* rbuf,
                      const std::string& chan,
                      const text_loco::tile_to_image_t* msg);
 
-  void handleImage(const lcm::ReceiveBuffer* rbuf,
-                     const std::string& chan,
-                     const bot_core::image_t* msg);
+  void handleImageFrame(const lcm::ReceiveBuffer* rbuf,
+                   const std::string& chan,
+                   const bot_core::image_t* msg);
 
-  void handleMap(const lcm::ReceiveBuffer* rbuf,
-                     const std::string& chan,
-                     const bot_core::image_t* msg);
+  void handleMapImage(const lcm::ReceiveBuffer* rbuf,
+                 const std::string& chan,
+                 const bot_core::image_t* msg);
 
-  map<double, vector<int64_t> >* tile_to_image_utimes;
-  vector<double>* tiles_seen;
-  map<double, int>* tiles_to_coords;
-  map<int64_t, QImage>* image_utime_to_image;
+  map<double, vector<int64_t> >* mapTileOriginToImageTimestamp;
+  vector<double>* allTileOrigins;
+  map<double, int>* mapTileOriginToMapCoords;
+  map<int64_t, QImage>* mapImageTimestampToImage;
   TileViewer* windowPointer;
 
-	signals:
-		void receivedImageForTile(double tileOrigin);
-		void receivedMap();
+signals:
+  void receivedImageForTile(double tileOrigin);
+  void receivedMap();
 
 };
 

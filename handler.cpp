@@ -1,6 +1,6 @@
 #include "handler.h"
 
-void Handler::handleMessage(const lcm::ReceiveBuffer* rbuf,
+void Handler::handleImageTileAssoc(const lcm::ReceiveBuffer* rbuf,
                    const std::string& chan,
                    const text_loco::tile_to_image_t* msg) {
   // we got a (tile, image_utime) pair
@@ -10,16 +10,16 @@ void Handler::handleMessage(const lcm::ReceiveBuffer* rbuf,
 	origin = floor(origin+0.5);
 
 	// if we haven't seen this tile, add it to our vector
-	if (find((*tiles_seen).begin(), (*tiles_seen).end(), origin) == (*tiles_seen).end()) {
-			(*tiles_seen).push_back(origin);
-			(*tiles_to_coords)[origin] = msg->y;
+  if (find(allTileOrigins->begin(), allTileOrigins->end(), origin) == allTileOrigins->end()) {
+      allTileOrigins->push_back(origin);
+      (*mapTileOriginToMapCoords)[origin] = msg->y;
 		}
 
 	// if we don't have this image for our tile, add it
-	vector<int64_t> images_for_tile = (*tile_to_image_utimes)[origin];
+  vector<int64_t> images_for_tile = (*mapTileOriginToImageTimestamp)[origin];
 	if (find(images_for_tile.begin(), images_for_tile.end(), msg->image_utime)
 			== images_for_tile.end()) {
-			(*tile_to_image_utimes)[origin].push_back(msg->image_utime);
+      (*mapTileOriginToImageTimestamp)[origin].push_back(msg->image_utime);
 			try {
 				emit receivedImageForTile(origin);
 			} catch (int e) {
@@ -30,14 +30,14 @@ void Handler::handleMessage(const lcm::ReceiveBuffer* rbuf,
 	// go through all tiles and print them out
 	vector<double>::iterator tile_it;
 	// cout << " -----------------------" << endl;
-	for (tile_it = (*tiles_seen).begin(); tile_it != (*tiles_seen).end(); ++tile_it) {
-			vector<int64_t> images = (*tile_to_image_utimes)[*tile_it];
+  for (tile_it = allTileOrigins->begin(); tile_it != allTileOrigins->end(); ++tile_it) {
+      vector<int64_t> images = (*mapTileOriginToImageTimestamp)[*tile_it];
 			// cout << *tile_it << " --> ";
 			// cout << images.size() << endl;
 		}
 	}
 
-void Handler::handleImage(const lcm::ReceiveBuffer* rbuf,
+void Handler::handleImageFrame(const lcm::ReceiveBuffer* rbuf,
                  const std::string& chan,
                  const bot_core::image_t* msg) {
   image_t current = *msg;
@@ -63,11 +63,11 @@ void Handler::handleImage(const lcm::ReceiveBuffer* rbuf,
   rectangle(image, Point(20+checkerXOffset, 40+checkerYOffset), Point(40+checkerXOffset, 60+checkerYOffset), Scalar(255, 255, 255), -1);
   rectangle(image, Point(40+checkerXOffset, 40+checkerYOffset), Point(60+checkerXOffset, 60+checkerYOffset), Scalar(0, 0, 0), -1);
   QImage qimage = QImage((const unsigned char*)(image.data), image.cols, image.rows, image.step, QImage::Format_RGB32);
-  (*image_utime_to_image)[msg->utime] = qimage;
+  (*mapImageTimestampToImage)[msg->utime] = qimage;
   image.release();
 }
 
-void Handler::handleMap(const lcm::ReceiveBuffer* rbuf,
+void Handler::handleMapImage(const lcm::ReceiveBuffer* rbuf,
                  const std::string& chan,
                  const bot_core::image_t* msg) {
   image_t current = *msg;
@@ -75,7 +75,11 @@ void Handler::handleMap(const lcm::ReceiveBuffer* rbuf,
   image.data = (unsigned char*) malloc(current.size);
   copy(current.data.begin(), current.data.end(), image.data);
   QImage qimage = QImage((const unsigned char*)(image.data), image.cols, image.rows, image.step, QImage::Format_RGB32);
-  windowPointer->maps->push_back(qimage);
-  emit receivedMap();
+  if (qimage.width() == 0 || qimage.height() == 0) {
+    std::cerr << "received a 0-width or 0-height image" << std::endl;
+  } else {
+    windowPointer->maps->push_back(qimage);
+    emit receivedMap();
+  }
   image.release();
 }

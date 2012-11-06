@@ -34,10 +34,10 @@ public:
   void updateImage(double tileOrigin);
   void setTile(int x, int y);
 
-  map<double, vector<int64_t> >* tile_to_image_utimes;
-  vector<double>* tiles_seen;
-  map<double, int>* tiles_to_coords;
-  map<int64_t, QImage>* image_utime_to_image;
+  map<double, vector<int64_t> >* mapTileOriginToImageTimestamp;
+  vector<double>* allTileOrigins;
+  map<double, int>* mapTileOriginToMapCoords;
+  map<int64_t, QImage>* mapImageTimestampToImage;
   vector<QImage>* maps;
   double selectedOrigin;
 

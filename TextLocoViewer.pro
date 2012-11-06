@@ -17,12 +17,12 @@ SOURCES += main.cpp\
         tileviewer.cpp\
         handler.cpp \
     lcmthread.cpp \
-    clickablegraphicsview.cpp
+    mapgraphicsview.cpp
 
 HEADERS  += tileviewer.h\
         handler.h \
     lcmthread.h \
-    clickablegraphicsview.h
+    mapgraphicsview.h
 
 FORMS    += tileviewer.ui
 
