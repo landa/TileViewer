@@ -47,6 +47,7 @@ public:
   vector<double>* allTileOrigins;
   map<double, int>* mapTileOriginToMapCoords;
   map<int64_t, QImage>* mapImageTimestampToImage;
+  map<int64_t, unsigned int>* mapImageTimestampToMapIndex;
   TileViewer* windowPointer;
 
 signals:

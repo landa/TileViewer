@@ -38,12 +38,13 @@ public:
   vector<double>* allTileOrigins;
   map<double, int>* mapTileOriginToMapCoords;
   map<int64_t, QImage>* mapImageTimestampToImage;
+  map<int64_t, unsigned int>* mapImageTimestampToMapIndex;
   vector<QImage>* maps;
   double selectedOrigin;
 
 public slots:
   void receivedImageForTile(double tileOrigin);
-  void updateMap();
+  void updateMap(int mapIndex = -1);
   void setFrame(int position);
 
 private:

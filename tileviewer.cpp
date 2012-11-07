@@ -40,15 +40,38 @@ void TileViewer::updateImage(double tileOrigin) {
   vector<int64_t> image_utimes = (*mapTileOriginToImageTimestamp)[tileOrigin];
   int chosen_image = MAX(0, image_utimes.size() - 1);
   // update the slider
+  ui->frameChoice->blockSignals(true);
   ui->frameChoice->setMinimum(0);
   ui->frameChoice->setMaximum(image_utimes.size()-1);
-  if (ui->frameChoice->value() == chosen_image) setFrame(chosen_image);
+  // if (ui->frameChoice->value() == chosen_image) setFrame(chosen_image);
   ui->frameChoice->setValue(chosen_image);
-  // emits a signal that is captured by setFrame
+  ui->frameChoice->blockSignals(false);
+
+  // double selectedTile = (*allTileOrigins)[selectedOrigin]; // wtf?
+  if (image_utimes.size() == 0) return;
+  int64_t image_utime = image_utimes[chosen_image];
+  QImage qimage = (*mapImageTimestampToImage)[image_utime];
+  if (qimage.width() == 0 || qimage.height() == 0) {
+    cerr << "trying to render a 0-width or 0-height image for utime " << image_utime << " and index " << chosen_image << "!" << endl;
+  }
+
+  // update the frame selection label
+  stringstream labelValue;
+  labelValue << "*Frame " << chosen_image << "/" << (image_utimes.size()-1);
+  ui->frameLabel->setText(labelValue.str().c_str());
+
+  // update the original frame tab
+  QGraphicsScene* originalScene = new QGraphicsScene();
+  QGraphicsPixmapItem* originalItem = new QGraphicsPixmapItem(QPixmap::fromImage(qimage));
+  originalScene->addItem(originalItem);
+  ui->frameView->setScene(originalScene);
+  ui->frameView->show();
 }
 
-void TileViewer::updateMap() {
-  QImage mapImage = maps->back();
+void TileViewer::updateMap(int mapIndex) {
+  QImage mapImage;
+  if (mapIndex == -1) mapImage = maps->back();
+  else mapImage = (*maps)[mapIndex];
   //maps->pop_back();
   if (mapImage.width() == 0 || mapImage.height() == 0) return;
   QGraphicsScene* scene = new QGraphicsScene();
@@ -65,6 +88,7 @@ void TileViewer::updateMap() {
 }
 
 void TileViewer::setFrame(int position) {
+  cerr << "FIMUS!!!!!!!!!!!!" << endl;
   double selectedTile = (*allTileOrigins)[selectedOrigin];
   vector<int64_t> image_utimes = (*mapTileOriginToImageTimestamp)[selectedTile];
   if (image_utimes.size() == 0) return;
@@ -86,24 +110,6 @@ void TileViewer::setFrame(int position) {
   ui->frameView->setScene(originalScene);
   ui->frameView->show();
 
-  // update the frame diff tab
-  // TODO: fix and enable
-  if (position-1 >= 0 && false) {
-    int64_t image_utime_prev = image_utimes[position-1];
-    QImage qimage_prev = (*mapImageTimestampToImage)[image_utime_prev];
-    if (qimage_prev.width() == 0 || qimage_prev.height() == 0) return;
-    cv::Mat cur(qimage.height(), qimage.width(), CV_8UC4);
-    cv::Mat prev(qimage.height(), qimage.width(), CV_8UC4);
-    cv::Mat mat_diff(qimage.height(), qimage.width(), CV_8UC4);
-    cur.data = (uchar*) qimage.data_ptr();
-    prev.data = (uchar*) qimage_prev.data_ptr();
-    cv::subtract(cur, prev, mat_diff);
-    QImage diff = QImage((const unsigned char*)(prev.data), prev.cols, prev.rows, prev.step, QImage::Format_RGB32);
-    std::cerr << "original: " << qimage.width() << "x" << qimage.height() << "; diff: " << diff.width() << "x" << diff.height() << std::endl;
-    QGraphicsScene* diffScene = new QGraphicsScene();
-    QGraphicsPixmapItem* diffItem = new QGraphicsPixmapItem(QPixmap::fromImage(diff));
-    diffScene->addItem(diffItem);
-    ui->diffView->setScene(diffScene);
-    ui->diffView->show();
-  }
+  int mapIndex = (*mapImageTimestampToMapIndex)[image_utime];
+  //if (mapIndex < maps->size()) updateMap((*mapImageTimestampToMapIndex)[image_utime]);
 }

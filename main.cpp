@@ -32,6 +32,7 @@ int main(int argc, char *argv[])
   map<double, int>* mapTileOriginToMapCoords = new map<double, int>;
   // map from an image timestamp to the image itself
   map<int64_t, QImage>* mapImageTimestampToImage = new map<int64_t, QImage>;
+  map<int64_t, unsigned int>* mapImageTimestampToMapIndex = new map<int64_t, unsigned int>;
 
   if(!lcm_instance.good()) return 1;
 
@@ -40,11 +41,13 @@ int main(int argc, char *argv[])
   handlerObject.allTileOrigins = allTileOrigins;
   handlerObject.mapTileOriginToMapCoords = mapTileOriginToMapCoords;
   handlerObject.mapImageTimestampToImage = mapImageTimestampToImage;
+  handlerObject.mapImageTimestampToMapIndex = mapImageTimestampToMapIndex;
 
   w.mapTileOriginToImageTimestamp = mapTileOriginToImageTimestamp;
   w.allTileOrigins = allTileOrigins;
   w.mapTileOriginToMapCoords = mapTileOriginToMapCoords;
   w.mapImageTimestampToImage = mapImageTimestampToImage;
+  w.mapImageTimestampToMapIndex = mapImageTimestampToMapIndex;
 
   handlerObject.windowPointer = &w;
 

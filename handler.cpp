@@ -64,6 +64,7 @@ void Handler::handleImageFrame(const lcm::ReceiveBuffer* rbuf,
   rectangle(image, Point(40+checkerXOffset, 40+checkerYOffset), Point(60+checkerXOffset, 60+checkerYOffset), Scalar(0, 0, 0), -1);
   QImage qimage = QImage((const unsigned char*)(image.data), image.cols, image.rows, image.step, QImage::Format_RGB32);
   (*mapImageTimestampToImage)[msg->utime] = qimage;
+  (*mapImageTimestampToMapIndex)[msg->utime] = MAX(0, windowPointer->maps->size() - 1);
   image.release();
 }
 

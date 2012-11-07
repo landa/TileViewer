@@ -20,6 +20,7 @@ public:
   TileViewer* windowPointer;
 
 signals:
+  void mapResized(int x, int y);
 
 public slots:
 
