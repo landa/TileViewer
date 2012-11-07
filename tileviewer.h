@@ -15,6 +15,7 @@
 #include <QGraphicsItem>
 #include <QGraphicsScene>
 #include <QGraphicsPixmapItem>
+#include <QScrollBar>
 
 using namespace std;
 using namespace bot_core;

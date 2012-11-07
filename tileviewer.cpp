@@ -21,6 +21,13 @@ void TileViewer::receivedImageForTile(double tileOrigin) {
 }
 
 void TileViewer::setTile(int x, int y) {
+  int mapXScroll = ui->mapView->horizontalScrollBar()->value();
+  int mapYScroll = ui->mapView->verticalScrollBar()->value();
+
+  // fix incorrect tile coordinates by adjusting them relative to the MapGraphicsView scroll offsets
+  x += mapXScroll;
+  y += mapYScroll;
+
   int width = ui->mapView->scene()->width();
   int height = ui->mapView->scene()->height();
   if (width == 0 || height == 0) return;
@@ -88,7 +95,6 @@ void TileViewer::updateMap(int mapIndex) {
 }
 
 void TileViewer::setFrame(int position) {
-  cerr << "FIMUS!!!!!!!!!!!!" << endl;
   double selectedTile = (*allTileOrigins)[selectedOrigin];
   vector<int64_t> image_utimes = (*mapTileOriginToImageTimestamp)[selectedTile];
   if (image_utimes.size() == 0) return;
