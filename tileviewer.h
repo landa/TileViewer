@@ -20,6 +20,7 @@
 using namespace std;
 using namespace bot_core;
 using namespace text_loco;
+using namespace cv;
 
 namespace Ui {
   class TileViewer;
@@ -38,7 +39,7 @@ public:
   map<double, vector<int64_t> >* mapTileOriginToImageTimestamp;
   vector<double>* allTileOrigins;
   map<double, int>* mapTileOriginToMapCoords;
-  map<int64_t, QImage>* mapImageTimestampToImage;
+  map<int64_t, Mat*>* mapImageTimestampToImage;
   map<int64_t, unsigned int>* mapImageTimestampToMapIndex;
   vector<QImage>* maps;
   double selectedOrigin;

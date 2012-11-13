@@ -57,7 +57,10 @@ void TileViewer::updateImage(double tileOrigin) {
   // double selectedTile = (*allTileOrigins)[selectedOrigin]; // wtf?
   if (image_utimes.size() == 0) return;
   int64_t image_utime = image_utimes[chosen_image];
-  QImage qimage = (*mapImageTimestampToImage)[image_utime];
+  Mat image = *((*mapImageTimestampToImage)[image_utime]);
+  std::cerr << "got Mat pointer!\n";
+  QImage qimage = QImage((const unsigned char*)(image.data), image.cols, image.rows, image.step, QImage::Format_RGB32);
+  std::cerr << "converted to QImage!\n";
   if (qimage.width() == 0 || qimage.height() == 0) {
     cerr << "trying to render a 0-width or 0-height image for utime " << image_utime << " and index " << chosen_image << "!" << endl;
   }
@@ -99,7 +102,8 @@ void TileViewer::setFrame(int position) {
   vector<int64_t> image_utimes = (*mapTileOriginToImageTimestamp)[selectedTile];
   if (image_utimes.size() == 0) return;
   int64_t image_utime = image_utimes[position];
-  QImage qimage = (*mapImageTimestampToImage)[image_utime];
+  Mat image = *((*mapImageTimestampToImage)[image_utime]);
+  QImage qimage = QImage((const unsigned char*)(image.data), image.cols, image.rows, image.step, QImage::Format_RGB32);
   if (qimage.width() == 0 || qimage.height() == 0) {
     cerr << "trying to render a 0-width or 0-height image for utime " << image_utime << " and index " << position << "!" << endl;
   }

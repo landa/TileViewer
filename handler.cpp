@@ -3,8 +3,6 @@
 void Handler::handleImageTileAssoc(const lcm::ReceiveBuffer* rbuf,
                    const std::string& chan,
                    const text_loco::tile_to_image_t* msg) {
-  // we got a (tile, image_utime) pair
-
 	// represent the tile by its origin
 	double origin = msg->x;
 	origin = floor(origin+0.5);
@@ -29,24 +27,25 @@ void Handler::handleImageTileAssoc(const lcm::ReceiveBuffer* rbuf,
 
 	// go through all tiles and print them out
 	vector<double>::iterator tile_it;
-	// cout << " -----------------------" << endl;
   for (tile_it = allTileOrigins->begin(); tile_it != allTileOrigins->end(); ++tile_it) {
       vector<int64_t> images = (*mapTileOriginToImageTimestamp)[*tile_it];
-			// cout << *tile_it << " --> ";
-			// cout << images.size() << endl;
 		}
 	}
 
 void Handler::handleImageFrame(const lcm::ReceiveBuffer* rbuf,
                  const std::string& chan,
                  const bot_core::image_t* msg) {
+
+  // Extract the image_t data into an OpenCV Mat
   image_t current = *msg;
-  // lcm_instance.publish( "SEEN_TILES_TEMP", &current ); // wtf?
-  Mat image(current.height,current.width,CV_8UC4);
-  //QImage((unsigned char*)(current.data), current.width, current.height, current.row_stride, QImage::Format_RGB32);
+  Mat* image_ptr = new Mat(current.height,current.width,CV_8UC4);
+  Mat image = *image_ptr;
   image.data = (unsigned char*) malloc(current.size);
   copy(current.data.begin(), current.data.end(), image.data);
+
+  // Crop the image so that we only have the left channel
   image = image(Rect(0, 0, MIN(image.cols, 1024), MIN(image.rows, 768)));
+
   // Draw a checkerboard pattern on the image
   int checkerXOffset = 10;
   int checkerYOffset = image.rows - 70;
@@ -62,10 +61,15 @@ void Handler::handleImageFrame(const lcm::ReceiveBuffer* rbuf,
   rectangle(image, Point(0+checkerXOffset, 40+checkerYOffset), Point(20+checkerXOffset, 60+checkerYOffset), Scalar(0, 0, 0), -1);
   rectangle(image, Point(20+checkerXOffset, 40+checkerYOffset), Point(40+checkerXOffset, 60+checkerYOffset), Scalar(255, 255, 255), -1);
   rectangle(image, Point(40+checkerXOffset, 40+checkerYOffset), Point(60+checkerXOffset, 60+checkerYOffset), Scalar(0, 0, 0), -1);
-  QImage qimage = QImage((const unsigned char*)(image.data), image.cols, image.rows, image.step, QImage::Format_RGB32);
-  (*mapImageTimestampToImage)[msg->utime] = qimage;
-  (*mapImageTimestampToMapIndex)[msg->utime] = MAX(0, windowPointer->maps->size() - 1);
-  image.release();
+
+  // Turn the Mat into a QImage
+  // QImage qimage = QImage((const unsigned char*)(image.data), image.cols, image.rows, image.step, QImage::Format_RGB32);
+  // (*mapImageTimestampToImage)[msg->utime] = qimage;
+  // (*mapImageTimestampToMapIndex)[msg->utime] = MAX(0, windowPointer->maps->size() - 1);
+  // image.release();
+
+  // Save the Mat into our vector
+  (*mapImageTimestampToImage)[msg->utime] = &image;
 }
 
 void Handler::handleMapImage(const lcm::ReceiveBuffer* rbuf,

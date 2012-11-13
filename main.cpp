@@ -9,7 +9,6 @@
 #include "lcmtypes/cpp/lcmtypes/bot_core/image_t.hpp"
 #include "handler.h"
 #include "lcmthread.h"
-#include <QImage>
 #include <QObject>
 
 using namespace std;
@@ -31,7 +30,7 @@ int main(int argc, char *argv[])
   // map from tile origins to map coordinates (to handle mouse clicks on the map)
   map<double, int>* mapTileOriginToMapCoords = new map<double, int>;
   // map from an image timestamp to the image itself
-  map<int64_t, QImage>* mapImageTimestampToImage = new map<int64_t, QImage>;
+  map<int64_t, Mat*>* mapImageTimestampToImage = new map<int64_t, Mat*>;
   map<int64_t, unsigned int>* mapImageTimestampToMapIndex = new map<int64_t, unsigned int>;
 
   if(!lcm_instance.good()) return 1;
