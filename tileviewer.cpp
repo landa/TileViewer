@@ -40,6 +40,7 @@ void TileViewer::setTile(int x, int y) {
     }
   }
   updateImage((*allTileOrigins)[selectedOrigin]);
+  fprintf(stderr, "setTile called!\n");
   updateMap();
 }
 
@@ -76,6 +77,18 @@ void TileViewer::updateImage(double tileOrigin) {
   originalScene->addItem(originalItem);
   ui->frameView->setScene(originalScene);
   ui->frameView->show();
+
+  // update the diff frame tab
+  int64_t image_utime_prev = image_utimes[chosen_image-1];
+  Mat diffMat;
+  Mat image_prev = *((*mapImageTimestampToImage)[image_utime]);
+  cv::subtract(image, image_prev, diffMat);
+  QImage qdiff = QImage((const unsigned char*)(diffMat.data), diffMat.cols, diffMat.rows, diffMat.step, QImage::Format_RGB32);
+  QGraphicsScene* diffScene = new QGraphicsScene();
+  QGraphicsPixmapItem* diffItem = new QGraphicsPixmapItem(QPixmap::fromImage(qdiff));
+  diffScene->addItem(diffItem);
+  ui->diffView->setScene(diffScene);
+  ui->diffView->show();
 }
 
 void TileViewer::updateMap(int mapIndex) {
@@ -87,6 +100,7 @@ void TileViewer::updateMap(int mapIndex) {
   QGraphicsScene* scene = new QGraphicsScene();
   QGraphicsPixmapItem* item = new QGraphicsPixmapItem(QPixmap::fromImage(mapImage));
   scene->addItem(item);
+  if (allTileOrigins->size() <= selectedOrigin) return;
   double origin = (*allTileOrigins)[selectedOrigin];
   int x_c = origin;
   int y_c = (*mapTileOriginToMapCoords)[origin];
@@ -120,6 +134,6 @@ void TileViewer::setFrame(int position) {
   ui->frameView->setScene(originalScene);
   ui->frameView->show();
 
-  int mapIndex = (*mapImageTimestampToMapIndex)[image_utime];
+  //int mapIndex = (*mapImageTimestampToMapIndex)[image_utime];
   //if (mapIndex < maps->size()) updateMap((*mapImageTimestampToMapIndex)[image_utime]);
 }
